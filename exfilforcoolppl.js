@@ -4,15 +4,13 @@ const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
 
-const outputPath = path.join(__dirname, 'passwords.txt');
+const outputPath = path.join('/media/flipper_zero', 'passwords.txt');
 
 function extractPasswords() {
-    // Simulate password extraction from the device
     const passwords = [
         'password1',
         'password2',
         'password3',
-        // Add more passwords as needed
     ];
 
     fs.writeFileSync(outputPath, passwords.join('\n'), 'utf8');
